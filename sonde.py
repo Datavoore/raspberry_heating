@@ -1,5 +1,7 @@
 import re
 
+from config import sondes_paths
+
 pattern = r"t=(\d+)"
 
 
@@ -21,3 +23,10 @@ class Sonde(object):
         with open(self.__path) as sonde_temp_file:
             file_content = sonde_temp_file.read()
         return parse_temperature_as_int(file_content)
+
+sondes = {}
+for i in range(len(sondes_paths)):
+    try :
+        sondes[i + 1] = Sonde(sondes_paths[i])
+    except FileNotFoundError:
+        pass
