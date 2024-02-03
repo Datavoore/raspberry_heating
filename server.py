@@ -22,7 +22,7 @@ async def run_main_loop():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize heater controller and run background tasks
-    asyncio.run(run_main_loop())
+    run_main_loop()
     yield
 
 app = FastAPI(lifespan=lifespan)
