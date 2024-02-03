@@ -1,3 +1,4 @@
+import datetime
 import logging
 import time
 
@@ -46,13 +47,11 @@ class HeatingController:
     def update(self):
         out_temp = self.__output_sensor.get_temperature() / 1000
         control_value = self.__pid(out_temp)
-        print(f"Control value: {control_value}")
-        print(f"Output temperature: {out_temp}")
+        now_str = datetime.datetime.now().strftime("%H:%M:%S")
+        print(f"{now_str} | {out_temp} | {control_value} |")
         if control_value > 0:
-            print(f"Raising valve for {control_value} seconds")
             self.__valve.raise_valve(control_value)
         else:
-            print(f"Lowering valve for {-control_value} seconds")
             self.__valve.lower_valve(-control_value)
 
     def set_wanted_temperature(self, wanted_temperature):
