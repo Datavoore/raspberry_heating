@@ -3,10 +3,8 @@ import time
 
 from GPIO import *
 from sonde import Sonde
-import asyncio
 from simple_pid import PID
 
-logger = logging.getLogger("Heating")
 
 
 class Valve(object):
@@ -36,13 +34,13 @@ class HeatingController:
     def update(self):
         out_temp = self.__output_sensor.get_temperature()
         control_value = self.__pid(out_temp)
-        logger.info(f"Control value: {control_value}")
-        logger.info(f"Output temperature: {out_temp}")
+        print(f"Control value: {control_value}")
+        print(f"Output temperature: {out_temp}")
         if control_value > 0:
-            logger.info(f"Raising valve for {control_value} seconds")
+            print(f"Raising valve for {control_value} seconds")
             self.__valve.raise_valve(control_value)
         else:
-            logger.info(f"Lowering valve for {-control_value} seconds")
+            print(f"Lowering valve for {-control_value} seconds")
             self.__valve.lower_valve(-control_value)
 
     def set_wanted_temperature(self, wanted_temperature):
