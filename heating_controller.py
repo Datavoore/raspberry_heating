@@ -29,7 +29,7 @@ class HeatingController:
         self.__pid = PID(1, 0.1, 0.05, setpoint=self.__wanted_temperature, sample_time=None, output_limits=(-10, 10))
 
     async def update(self):
-        control_value = self.__pid(self.__output_sensor)
+        control_value = self.__pid(self.__output_sensor.get_temperature())
         if control_value > 0:
             await self.__valve.raise_valve(control_value)
         else:
