@@ -38,3 +38,6 @@ class HeatingController:
     def set_wanted_temperature(self, wanted_temperature):
         self.__wanted_temperature = wanted_temperature
         self.__pid.setpoint = wanted_temperature
+
+    def get_output_temperature(self):
+        return self.__output_sensor.get_temperature()

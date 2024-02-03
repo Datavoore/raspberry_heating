@@ -12,9 +12,10 @@ from fastapi.responses import FileResponse
 from fastapi import BackgroundTasks
 
 app = FastAPI()
+heating_controller = HeatingController(sondes[2], None, Valve(relay_lower_pin_num, relay_raise_pin_num), 50)
 
 
-def run_main_loop(heating_controller: HeatingController):
+def run_main_loop():
     while True:
         heating_controller.update()
         asyncio.sleep(40)
@@ -23,8 +24,7 @@ def run_main_loop(heating_controller: HeatingController):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize heater controller and run background tasks
-    heating_controller = HeatingController(sondes[2], None, Valve(relay_lower_pin_num, relay_raise_pin_num))
-    BackgroundTasks.add_task(run_main_loop, heating_controller)
+    main_loop = asyncio.create_task(run_main_loop())
     yield
 
 
@@ -37,6 +37,9 @@ async def get_temp(sonde_number: int):
     else:
         return {f"Sonde not found"}
 
+@app.get("/temperature")
+async def get_temp():
+    return {f"Temperature Sonde": heating_controller.get_output_temperature()}
 
 @app.get('/favicon.ico', include_in_schema=False)
 async def favicon():
