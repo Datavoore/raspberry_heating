@@ -5,6 +5,7 @@ import time
 from GPIO import *
 from sonde import Sonde
 from simple_pid import PID
+from csv import writer
 
 
 class Valve(object):
@@ -21,6 +22,17 @@ class Valve(object):
         GPIO.output(self.__raise_pin, 1)
         time.sleep(time_interval)
         GPIO.output(self.__raise_pin, 0)
+
+
+def write_row_to_csv(row):
+    with open("temps.csv", "a") as f_object:
+        # Pass this file object to csv.writer()
+        # and get a writer object
+        writer_object = writer(f_object)
+        writer_object.writerow(row)
+
+        # Close the file object
+        f_object.close()
 
 
 class HeatingController:
@@ -50,6 +62,8 @@ class HeatingController:
         control_value = self.__pid(out_temp)
         now_str = datetime.datetime.now().strftime("%H:%M:%S")
         print(f"{now_str} | {out_temp} | {control_value} |")
+        csv_row = [now_str, out_temp, control_value]
+        write_row_to_csv(csv_row)
         if control_value > 0:
             self.__valve.raise_valve(control_value)
         else:
