@@ -1,4 +1,5 @@
 import logging
+import time
 
 import GPIO
 from sonde import Sonde
@@ -7,19 +8,20 @@ from simple_pid import PID
 
 logger = logging.getLogger("Heating")
 
+
 class Valve(object):
     def __init__(self, lower_pin, raise_pin):
         self.__lower_pin = lower_pin
         self.__raise_pin = raise_pin
 
-    async def lower_valve(self, time_interval):
+    def lower_valve(self, time_interval):
         GPIO.output(self.__lower_pin, 1)
-        await asyncio.sleep(time_interval)
+        time.sleep(time_interval)
         GPIO.output(self.__lower_pin, 0)
 
-    async def raise_valve(self, time_interval):
+    def raise_valve(self, time_interval):
         GPIO.output(self.__raise_pin, 1)
-        await asyncio.sleep(time_interval)
+        time.sleep(time_interval)
         GPIO.output(self.__raise_pin, 0)
 
 
@@ -31,17 +33,17 @@ class HeatingController:
         self.__wanted_temperature = wanted_temperature
         self.__pid = PID(1, 0.1, 0.05, setpoint=self.__wanted_temperature, sample_time=None, output_limits=(-10, 10))
 
-    async def update(self):
+    def update(self):
         out_temp = self.__output_sensor.get_temperature()
         control_value = self.__pid(out_temp)
         logger.info(f"Control value: {control_value}")
         logger.info(f"Output temperature: {out_temp}")
         if control_value > 0:
             logger.info(f"Raising valve for {control_value} seconds")
-            await self.__valve.raise_valve(control_value)
+            self.__valve.raise_valve(control_value)
         else:
             logger.info(f"Lowering valve for {-control_value} seconds")
-            await self.__valve.lower_valve(-control_value)
+            self.__valve.lower_valve(-control_value)
 
     def set_wanted_temperature(self, wanted_temperature):
         self.__wanted_temperature = wanted_temperature
