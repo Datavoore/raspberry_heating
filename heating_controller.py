@@ -1,7 +1,7 @@
 import logging
 import time
 
-import RPi.GPIO as GPIO
+from GPIO import *
 from sonde import Sonde
 import asyncio
 from simple_pid import PID
