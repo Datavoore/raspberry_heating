@@ -54,7 +54,7 @@ class HeatingController:
             setpoint=self.__wanted_temperature,
             sample_time=None,
             output_limits=(-4, 4),
-            proportional_on_measurement=True,
+            # proportional_on_measurement=True,
         )
 
     def update(self):
