@@ -10,13 +10,8 @@ for i in range(len(sondes_paths)) :
 
 app = FastAPI()
 
-mode = 0
-
 @app.get("/")
 async def root():
-    global mode
-    GPIO.output(relay_1_pin_num, mode)
-    mode = not mode
     return {"message": "Hello Papa"}
 
 @app.get("/temperature/{sonde_number}")
