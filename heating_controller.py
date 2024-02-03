@@ -37,11 +37,12 @@ class HeatingController:
         self.__wanted_temperature = wanted_temperature
         self.__pid = PID(
             1,
-            0.1,
+            0.5,
             0.05,
             setpoint=self.__wanted_temperature,
             sample_time=None,
             output_limits=(-4, 4),
+            proportional_on_measurement=True,
         )
 
     def update(self):
