@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -11,7 +12,7 @@ from config import favicon_path
 from fastapi.responses import FileResponse
 
 heating_controller = HeatingController(sondes[2], None, Valve(relay_lower_pin_num, relay_raise_pin_num), 50)
-
+logger_main = logging.getLogger("Main")
 
 async def run_main_loop():
     while True:
@@ -22,7 +23,7 @@ async def run_main_loop():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize heater controller and run background tasks
-    run_main_loop()
+    logger_main.info("Running server")
     yield
 
 app = FastAPI(lifespan=lifespan)
