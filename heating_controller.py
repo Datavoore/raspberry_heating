@@ -32,7 +32,7 @@ class HeatingController:
         self.__pid = PID(1, 0.1, 0.05, setpoint=self.__wanted_temperature, sample_time=None, output_limits=(-10, 10))
 
     def update(self):
-        out_temp = self.__output_sensor.get_temperature()
+        out_temp = self.__output_sensor.get_temperature() / 1000
         control_value = self.__pid(out_temp)
         print(f"Control value: {control_value}")
         print(f"Output temperature: {out_temp}")
