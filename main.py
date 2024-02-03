@@ -12,3 +12,6 @@ def run_main_loop():
         heating_controller.update()
         time.sleep(40)
 
+
+if __name__ == "__main__":
+    run_main_loop()
