@@ -11,8 +11,11 @@ from sonde import sondes
 from config import favicon_path
 from fastapi.responses import FileResponse
 
-heating_controller = HeatingController(sondes[2], None, Valve(relay_lower_pin_num, relay_raise_pin_num), 50)
+heating_controller = HeatingController(
+    sondes[2], None, Valve(relay_lower_pin_num, relay_raise_pin_num), 50
+)
 logger_main = logging.getLogger("Main")
+
 
 async def run_main_loop():
     while True:
@@ -26,7 +29,9 @@ async def lifespan(app: FastAPI):
     logger_main.info("Running server")
     yield
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/temperature/{sonde_number}")
 async def get_temp(sonde_number: int):
@@ -37,10 +42,12 @@ async def get_temp(sonde_number: int):
     else:
         return {f"Sonde not found"}
 
+
 @app.get("/temperature")
 async def get_temp():
     return {f"Temperature Sonde": heating_controller.get_output_temperature()}
 
-@app.get('/favicon.ico', include_in_schema=False)
+
+@app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse(favicon_path)

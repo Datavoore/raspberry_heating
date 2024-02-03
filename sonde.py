@@ -24,9 +24,10 @@ class Sonde(object):
             file_content = sonde_temp_file.read()
         return parse_temperature_as_int(file_content)
 
+
 sondes = {}
 for i in range(len(sondes_paths)):
-    try :
+    try:
         sondes[i + 1] = Sonde(sondes_paths[i])
     except FileNotFoundError:
         pass

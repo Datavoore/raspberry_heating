@@ -6,7 +6,6 @@ from sonde import Sonde
 from simple_pid import PID
 
 
-
 class Valve(object):
     def __init__(self, lower_pin, raise_pin):
         self.__lower_pin = lower_pin
@@ -24,12 +23,25 @@ class Valve(object):
 
 
 class HeatingController:
-    def __init__(self, output_sensor: Sonde, external_sensor: Sonde, valve: Valve, wanted_temperature: int = 40):
+    def __init__(
+        self,
+        output_sensor: Sonde,
+        external_sensor: Sonde,
+        valve: Valve,
+        wanted_temperature: int = 40,
+    ):
         self.__output_sensor = output_sensor
         self.__external_sensor = external_sensor
         self.__valve = valve
         self.__wanted_temperature = wanted_temperature
-        self.__pid = PID(1, 0.1, 0.05, setpoint=self.__wanted_temperature, sample_time=None, output_limits=(-10, 10))
+        self.__pid = PID(
+            1,
+            0.1,
+            0.05,
+            setpoint=self.__wanted_temperature,
+            sample_time=None,
+            output_limits=(-4, 4),
+        )
 
     def update(self):
         out_temp = self.__output_sensor.get_temperature() / 1000
