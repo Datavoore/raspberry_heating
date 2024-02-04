@@ -6,7 +6,7 @@ from config import favicon_path
 from fastapi.responses import FileResponse
 
 import datetime
-import psutil
+import csv
 from easycharts import ChartServer
 from easyschedule import EasyScheduler
 
@@ -28,6 +28,9 @@ async def lifespan(app: FastAPI):
         charts_db="charts_database",
         chart_prefix='/mycharts'
     )
+    data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 30)
+    csv_reader = csv.reader(data, delimiter=',')
+    logger.info(list(csv_reader))
     await app.charts.create_dataset(
         'ext_temperature',
         labels=[],
