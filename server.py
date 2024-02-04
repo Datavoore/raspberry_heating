@@ -1,3 +1,4 @@
+import datetime
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -43,7 +44,8 @@ async def favicon():
 
 @app.get("/plot")
 async def plot():
-    temps_df = pd.read_csv(data_path + "2024-02-04.csv",
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d")
+    temps_df = pd.read_csv(data_path + f"{now_str}.csv",
                            names=("time", "temperature_out", "external_temperature", "wanted_temperature", "control"),
                            header=None, sep=",")
     temps_df["parsed_datetime"] = pd.to_datetime(temps_df["time"])
