@@ -29,10 +29,15 @@ async def lifespan(app: FastAPI):
         chart_prefix='/mycharts'
     )
     await app.charts.create_dataset(
-        'ext_temperature'
+        'ext_temperature',
+        labels=[],
+        data=[],
     )
     await app.charts.create_dataset(
-        'out_temperature'
+        'out_temperature',
+        labels=[],
+        data=[],
+
     )
     yield
 
