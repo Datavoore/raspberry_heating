@@ -33,6 +33,9 @@ async def lifespan(app: FastAPI):
     dates = [line[0] for line in csv_reader]
     output_temperatures = [line[1] for line in csv_reader]
     external_temperatures = [line[2] for line in csv_reader]
+    logger.info(f"Dates: {dates}")
+    logger.info(f"Output temperatures: {output_temperatures}")
+    logger.info(f"External temperatures: {external_temperatures}")
     await app.charts.create_dataset(
         'ext_temperature',
         labels=dates,
