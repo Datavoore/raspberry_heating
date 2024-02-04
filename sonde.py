@@ -1,7 +1,9 @@
+import logging
 import re
 
 from config import sondes_paths
-from fastapi.logger import logger
+#from fastapi.logger import logger
+logger = logging.getLogger("uvicorn.access")
 
 pattern = r"t=(\d+)"
 

@@ -1,11 +1,13 @@
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from fastapi.logger import logger
+#from fastapi.logger import logger
 from sonde import sondes
 from config import favicon_path
 from fastapi.responses import FileResponse
 
+logger = logging.getLogger("uvicorn.access")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
