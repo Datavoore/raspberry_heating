@@ -1,17 +1,22 @@
 import datetime
-import logging
 import time
 
-from GPIO import *
 from sonde import Sonde
 from simple_pid import PID
 from csv import writer
+import RPi.GPIO as GPIO
+from config import relay_lower_pin_num, relay_raise_pin_num
 
 
 class Valve(object):
     def __init__(self, lower_pin, raise_pin):
         self.__lower_pin = lower_pin
         self.__raise_pin = raise_pin
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(relay_lower_pin_num, GPIO.OUT)
+        GPIO.setup(relay_raise_pin_num, GPIO.OUT)
+        GPIO.output(relay_lower_pin_num, 0)
+        GPIO.output(relay_raise_pin_num, 0)
 
     def lower_valve(self, time_interval):
         GPIO.output(self.__lower_pin, 1)
@@ -28,12 +33,8 @@ def write_row_to_csv(row):
     now = datetime.datetime.now()
     csv_file_name = "data/" + now.strftime("%Y-%m-%d") + ".csv"
     with open(csv_file_name, "a") as f_object:
-        # Pass this file object to csv.writer()
-        # and get a writer object
         writer_object = writer(f_object)
         writer_object.writerow(row)
-
-        # Close the file object
         f_object.close()
 
 
@@ -78,11 +79,16 @@ class HeatingController:
             control_value = 0
         else:
             control_value = pid_control
-        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"{now_str} | {out_temp} | {control_value} | {self.__wanted_temperature}")
-        csv_row = [now_str, out_temp, control_value, self.__wanted_temperature]
-        write_row_to_csv(csv_row)
+
         if control_value > 0:
             self.__valve.raise_valve(control_value)
         elif control_value < 0:
             self.__valve.lower_valve(-control_value)
+
+        self.log_and_save_data(out_temp, control_value)
+
+    def log_and_save_data(self, out_temp, control):
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"{now_str} | {out_temp} | {control} | {self.__wanted_temperature}")
+        csv_row = [now_str, out_temp, control, self.__wanted_temperature]
+        write_row_to_csv(csv_row)
