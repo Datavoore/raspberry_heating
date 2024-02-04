@@ -28,12 +28,6 @@ async def lifespan(app: FastAPI):
         charts_db="charts_database",
         chart_prefix='/mycharts'
     )
-    data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 30)
-    csv_reader = csv.reader(data, delimiter=',')
-    lines = [(line[0], line[1], line[2]) for line in csv_reader]
-    dates = [line[0] for line in lines]
-    output_temperatures = [line[1] for line in lines]
-    external_temperatures = [line[2] for line in lines]
     logger.info(f"Dates: {dates}")
     logger.info(f"Output temperatures: {output_temperatures}")
     logger.info(f"External temperatures: {external_temperatures}")
@@ -70,19 +64,21 @@ async def favicon():
 
 @app.get("/last_n_lines")
 async def test_n_lines():
-    return open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 10)
-# @scheduler(schedule="*/2 * * * *")
-# async def resource_monitor():
-#     time_now = datetime.datetime.now().isoformat()[11:19]
-#
-#     # updates CPU & MEM datasets with current time
-#     await app.charts.update_dataset(
-#         'cpu',
-#         label=time_now,
-#         data=psutil.cpu_percent()
-#     )
-#     await app.charts.update_dataset(
-#         'mem',
-#         label=time_now,
-#         data=psutil.virtual_memory().percent
-#     )
+    time_now = datetime.datetime.now().isoformat()[11:19]
+    data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 30)
+    csv_reader = csv.reader(data, delimiter=',')
+    lines = [(line[0], line[1], line[2]) for line in csv_reader]
+    dates = [line[0] for line in lines]
+    output_temperatures = [line[1] for line in lines]
+    external_temperatures = [line[2] for line in lines]
+    for i in range(len(dates)):
+        await app.charts.update_dataset(
+            'ext_temperature',
+            label=dates[i],
+            data=external_temperatures[i]
+        )
+        await app.charts.update_dataset(
+            'out_temperature',
+            label=dates[i],
+            data=output_temperatures[i]
+        )
