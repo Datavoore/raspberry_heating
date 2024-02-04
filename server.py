@@ -30,16 +30,18 @@ async def lifespan(app: FastAPI):
     )
     data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 30)
     csv_reader = csv.reader(data, delimiter=',')
-    logger.info(list(csv_reader))
+    dates = [line[0] for line in csv_reader]
+    output_temperatures = [line[1] for line in csv_reader]
+    external_temperatures = [line[2] for line in csv_reader]
     await app.charts.create_dataset(
         'ext_temperature',
-        labels=[],
-        dataset=[]
+        labels=dates,
+        dataset=external_temperatures
     )
     await app.charts.create_dataset(
         'out_temperature',
-        labels=[],
-        dataset=[]
+        labels=dates,
+        dataset=output_temperatures
     )
     yield
 
