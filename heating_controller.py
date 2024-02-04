@@ -25,7 +25,9 @@ class Valve(object):
 
 
 def write_row_to_csv(row):
-    with open("temps.csv", "a") as f_object:
+    now = datetime.datetime.now()
+    csv_file_name = "data/" + now.strftime("%Y-%m-%d") + ".csv"
+    with open(csv_file_name, "a") as f_object:
         # Pass this file object to csv.writer()
         # and get a writer object
         writer_object = writer(f_object)
@@ -37,16 +39,18 @@ def write_row_to_csv(row):
 
 class HeatingController:
     def __init__(
-        self,
-        output_sensor: Sonde,
-        external_sensor: Sonde,
-        valve: Valve,
-        wanted_temperature: int = 40,
+            self,
+            output_sensor: Sonde,
+            external_sensor: Sonde,
+            valve: Valve,
+            wanted_temperature: int = 40,
+            tolerance: int = 0.7,
     ):
         self.__output_sensor = output_sensor
         self.__external_sensor = external_sensor
         self.__valve = valve
         self.__wanted_temperature = wanted_temperature
+        self.__tolerance = tolerance
         self.__pid = PID(
             1,
             0.5,
@@ -57,21 +61,28 @@ class HeatingController:
             # proportional_on_measurement=True,
         )
 
+    @property
+    def wanted_temperature(self):
+        return self.__wanted_temperature
+
+    @wanted_temperature.setter
+    def wanted_temperature(self, wanted_temperature):
+        self.__wanted_temperature = wanted_temperature
+        self.__pid.setpoint = wanted_temperature
+
     def update(self):
         out_temp = self.__output_sensor.get_temperature() / 1000
-        control_value = self.__pid(out_temp)
-        now_str = datetime.datetime.now().strftime("%H:%M:%S")
+        pid_control = self.__pid(out_temp)
+        # This means we are close to the wanted temperature, no need to use PID control
+        if abs(out_temp - self.__wanted_temperature) <= self.__tolerance:
+            control_value = 0
+        else:
+            control_value = pid_control
+        now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"{now_str} | {out_temp} | {control_value} |")
         csv_row = [now_str, out_temp, control_value]
         write_row_to_csv(csv_row)
         if control_value > 0:
             self.__valve.raise_valve(control_value)
-        else:
+        elif control_value < 0:
             self.__valve.lower_valve(-control_value)
-
-    def set_wanted_temperature(self, wanted_temperature):
-        self.__wanted_temperature = wanted_temperature
-        self.__pid.setpoint = wanted_temperature
-
-    def get_output_temperature(self):
-        return self.__output_sensor.get_temperature()
