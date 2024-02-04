@@ -1,15 +1,18 @@
 import re
 
 from config import sondes_paths
+from fastapi.logger import logger
 
 pattern = r"t=(\d+)"
 
 
-def parse_temperature_as_int(sonde_file_content, regex=pattern):
+def parse_temperature_as_int(sonde_file_content):
     match = re.search(pattern, sonde_file_content)
     if match:
         extracted_number = int(match.group(1))
-    return extracted_number
+        return extracted_number
+    else:
+        raise ValueError("Temperature not found in file")
 
 
 class Sonde(object):
@@ -30,4 +33,4 @@ for i in range(len(sondes_paths)):
     try:
         sondes[i + 1] = Sonde(sondes_paths[i])
     except FileNotFoundError:
-        pass
+        logger.error(f"Sonde {i + 1} not found (path: {sondes_paths[i]})")
