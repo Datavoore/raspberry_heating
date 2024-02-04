@@ -61,9 +61,9 @@ async def favicon():
 
 
 @app.get("/last_n_lines")
-async def test_n_lines():
+async def test_n_lines(n:int):
     time_now = datetime.datetime.now().isoformat()[11:19]
-    data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 30)
+    data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", n)
     csv_reader = csv.reader(data, delimiter=',')
     lines = [(line[0], line[1], line[2]) for line in csv_reader]
     dates = [line[0] for line in lines]
