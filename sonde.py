@@ -35,4 +35,4 @@ for i in range(len(sondes_paths)):
     try:
         sondes[i + 1] = Sonde(sondes_paths[i])
     except FileNotFoundError:
-        logger.error(f"Sonde {i + 1} not found (path: {sondes_paths[i]})")
+        logger.info(f"Sonde {i + 1} not found (path: {sondes_paths[i]})")
