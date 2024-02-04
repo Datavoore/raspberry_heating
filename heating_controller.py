@@ -8,6 +8,10 @@ import RPi.GPIO as GPIO
 from config import relay_lower_pin_num, relay_raise_pin_num
 
 
+def heating_curve(external_temperature, coefficient, command):
+    return -coefficient * external_temperature + command
+
+
 class Valve(object):
     def __init__(self, lower_pin, raise_pin):
         self.__lower_pin = lower_pin
@@ -44,38 +48,36 @@ class HeatingController:
             output_sensor: Sonde,
             external_sensor: Sonde,
             valve: Valve,
-            wanted_temperature: int = 40,
             tolerance: int = 0.7,
+            coefficient: int = 1.4,
+            command: int = 50
     ):
         self.__output_sensor = output_sensor
         self.__external_sensor = external_sensor
         self.__valve = valve
-        self.__wanted_temperature = wanted_temperature
         self.__tolerance = tolerance
+        self.__coefficient = coefficient
+        self.__command = command
+        wanted_temperature = heating_curve(external_sensor.get_temperature() / 1000, coefficient, command)
         self.__pid = PID(
             1,
             0.5,
             0.05,
-            setpoint=self.__wanted_temperature,
+            setpoint=wanted_temperature,
             sample_time=None,
             output_limits=(-4, 4),
             # proportional_on_measurement=True,
         )
 
-    @property
-    def wanted_temperature(self):
-        return self.__wanted_temperature
-
-    @wanted_temperature.setter
-    def wanted_temperature(self, wanted_temperature):
-        self.__wanted_temperature = wanted_temperature
-        self.__pid.setpoint = wanted_temperature
-
     def update(self):
-        out_temp = self.__output_sensor.get_temperature() / 1000
-        pid_control = self.__pid(out_temp)
+        output_temp = self.__output_sensor.get_temperature() / 1000
+        pid_control = self.__pid(output_temp)
+        outside_temperature = self.__external_sensor.get_temperature() / 1000
+        wanted_temperature = heating_curve(outside_temperature,
+                                           self.__coefficient,
+                                           self.__command)
         # This means we are close to the wanted temperature, no need to use PID control
-        if abs(out_temp - self.__wanted_temperature) <= self.__tolerance:
+        if abs(output_temp - wanted_temperature) <= self.__tolerance:
             control_value = 0
         else:
             control_value = pid_control
@@ -85,10 +87,11 @@ class HeatingController:
         elif control_value < 0:
             self.__valve.lower_valve(-control_value)
 
-        self.log_and_save_data(out_temp, control_value)
+        self.log_and_save_data(output_temp, outside_temperature, control_value)
 
-    def log_and_save_data(self, out_temp, control):
+    def log_and_save_data(self, output_temp, external_temp, control):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"{now_str} | {out_temp} | {control} | {self.__wanted_temperature}")
-        csv_row = [now_str, out_temp, control, self.__wanted_temperature]
+        wanted_temperature = heating_curve(external_temp, self.__coefficient, self.__command)
+        print(f"{now_str} | {output_temp} | {external_temp} | {control} | {wanted_temperature}")
+        csv_row = [now_str, output_temp, external_temp, control, wanted_temperature]
         write_row_to_csv(csv_row)

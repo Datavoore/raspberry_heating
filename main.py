@@ -5,8 +5,8 @@ from heating_controller import HeatingController, Valve
 from sonde import sondes
 
 heating_controller = HeatingController(
-    sondes[2],
-    external_sensor=None,
+    output_sensor=sondes[2],
+    external_sensor=sondes[1],
     valve=Valve(relay_lower_pin_num, relay_raise_pin_num),
     wanted_temperature=40,
 )
