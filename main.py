@@ -8,16 +8,15 @@ heating_controller = HeatingController(
     output_sensor=sondes[2],
     external_sensor=sondes[1],
     valve=Valve(relay_lower_pin_num, relay_raise_pin_num),
-    wanted_temperature=40,
 )
 
 
 def run_main_loop():
     while True:
         heating_controller.update()
-        time.sleep(30 * 2)
+        time.sleep(30)
 
 
 if __name__ == "__main__":
-    print("Sonde Temperature | Control Value | Active Time | Wanted Temperature")
+    print("Date/time | Output Temperature | External Temperature | Wanted Temperature | Control Value (time to open valve)")
     run_main_loop()

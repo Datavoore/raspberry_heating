@@ -92,6 +92,6 @@ class HeatingController:
     def log_and_save_data(self, output_temp, external_temp, control):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         wanted_temperature = heating_curve(external_temp, self.__coefficient, self.__command)
-        print(f"{now_str} | {output_temp} | {external_temp} | {control} | {wanted_temperature}")
-        csv_row = [now_str, output_temp, external_temp, control, wanted_temperature]
+        print(f"{now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control}")
+        csv_row = [now_str, output_temp, external_temp, wanted_temperature, control]
         write_row_to_csv(csv_row)
