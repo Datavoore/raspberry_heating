@@ -22,7 +22,7 @@ def open_last_n_rows(file_path, n):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Running server")
-    await scheduler.start()
+    scheduler.start()
     app.charts = await ChartServer.create(
         app,
         charts_db="charts_database",
