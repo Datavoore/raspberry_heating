@@ -19,5 +19,5 @@ def run_main_loop():
 
 
 if __name__ == "__main__":
-    print("Sonde Temperature | Control Value | Active Time")
+    print("Sonde Temperature | Control Value | Active Time | Wanted Temperature")
     run_main_loop()
