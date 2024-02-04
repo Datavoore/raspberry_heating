@@ -79,8 +79,8 @@ class HeatingController:
         else:
             control_value = pid_control
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"{now_str} | {out_temp} | {control_value} |")
-        csv_row = [now_str, out_temp, control_value]
+        print(f"{now_str} | {out_temp} | {control_value} | {self.__wanted_temperature}")
+        csv_row = [now_str, out_temp, control_value, self.__wanted_temperature]
         write_row_to_csv(csv_row)
         if control_value > 0:
             self.__valve.raise_valve(control_value)
