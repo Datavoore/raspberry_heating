@@ -28,18 +28,11 @@ async def lifespan(app: FastAPI):
         charts_db="charts_database",
         chart_prefix='/mycharts'
     )
-    logger.info(f"Dates: {dates}")
-    logger.info(f"Output temperatures: {output_temperatures}")
-    logger.info(f"External temperatures: {external_temperatures}")
     await app.charts.create_dataset(
-        'ext_temperature',
-        labels=dates,
-        dataset=external_temperatures
+        'ext_temperature'
     )
     await app.charts.create_dataset(
-        'out_temperature',
-        labels=dates,
-        dataset=output_temperatures
+        'out_temperature'
     )
     yield
 
