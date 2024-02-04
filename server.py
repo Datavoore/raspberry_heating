@@ -30,9 +30,10 @@ async def lifespan(app: FastAPI):
     )
     data = open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 30)
     csv_reader = csv.reader(data, delimiter=',')
-    dates = [line[0] for line in csv_reader]
-    output_temperatures = [line[1] for line in csv_reader]
-    external_temperatures = [line[2] for line in csv_reader]
+    lines = [(line[0], line[1], line[2]) for line in csv_reader]
+    dates = [line[0] for line in lines]
+    output_temperatures = [line[1] for line in lines]
+    external_temperatures = [line[2] for line in lines]
     logger.info(f"Dates: {dates}")
     logger.info(f"Output temperatures: {output_temperatures}")
     logger.info(f"External temperatures: {external_temperatures}")
