@@ -59,6 +59,7 @@ async def favicon():
     return FileResponse(favicon_path)
 
 
+@app.get("/last_n_lines")
 async def test_n_lines():
     return open_last_n_rows("/home/pi/Documents/raspberry_heating/data/2024-02-04.csv", 10)
 # @scheduler(schedule="*/2 * * * *")
