@@ -76,6 +76,7 @@ class HeatingController:
         wanted_temperature = heating_curve(outside_temperature,
                                            self.__coefficient,
                                            self.__command)
+        self.__pid.setpoint = wanted_temperature
         # This means we are close to the wanted temperature, no need to use PID control
         if abs(output_temp - wanted_temperature) <= self.__tolerance:
             control_value = 0
