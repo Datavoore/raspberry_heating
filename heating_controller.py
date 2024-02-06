@@ -9,7 +9,11 @@ from config import relay_lower_pin_num, relay_raise_pin_num
 
 
 def heating_curve(external_temperature, coefficient, command):
-    return -coefficient * external_temperature + command
+    now = datetime.datetime.now()
+    if now.hour <= 7 or now.hour >= 22:
+        return -coefficient * external_temperature + (command-15)
+    else:
+        return -coefficient * external_temperature + command
 
 
 class Valve(object):

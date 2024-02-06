@@ -1,14 +1,11 @@
-import datetime
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from starlette.responses import HTMLResponse
 
 from sonde import sondes
-from config import favicon_path, data_path
+from config import favicon_path
 from fastapi.responses import FileResponse
-import pandas as pd
-import plotly.graph_objects as go
+
 
 logger = logging.getLogger("server")
 
@@ -32,7 +29,7 @@ async def get_temp(sonde_number: int):
     sonde = sondes.get(sonde_number)
     if sonde:
         temperature = sonde.get_temperature()
-        return {f"Temperature Sonde {sonde_number}": temperature}
+        return {f"Température Sonde {sonde_number}": temperature}
     else:
         return {f"Sonde not found"}
 
@@ -41,73 +38,3 @@ async def get_temp(sonde_number: int):
 async def favicon():
     return FileResponse(favicon_path)
 
-
-@app.get("/plot")
-async def plot(date: str = None):
-    if date is None:
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-    temps_df = pd.read_csv(
-        data_path + f"{date}.csv",
-        names=(
-            "time",
-            "temperature_out",
-            "external_temperature",
-            "wanted_temperature",
-            "control",
-        ),
-        header=None,
-        sep=",",
-    )
-    temps_df["parsed_datetime"] = pd.to_datetime(temps_df["time"])
-    # Create a bar trace for control values with increased transparency
-    trace3 = go.Bar(
-        x=temps_df["parsed_datetime"],
-        y=temps_df["control"],
-        name="Control",
-        yaxis="y2",
-        marker=dict(color="rgba(255, 0, 0, 0.3)"),
-    )
-
-    # Create a line trace for temperature values
-    trace1 = go.Scatter(
-        x=temps_df["parsed_datetime"],
-        y=temps_df["temperature_out"],
-        mode="lines",
-        name="Temperature Out",
-    )
-    trace2 = go.Scatter(
-        x=temps_df["parsed_datetime"],
-        y=temps_df["wanted_temperature"],
-        mode="lines",
-        name="Wanted Temperature",
-    )
-
-    # Create layout with two y-axes
-    layout = go.Layout(
-        title="Temperature eau et temperature voulue",
-        yaxis=dict(title="Temperature"),
-        yaxis2=dict(title="Control", overlaying="y", side="right"),
-    )
-
-    # Create a figure with the defined traces and layout
-    fig = go.Figure(data=[trace3, trace1, trace2], layout=layout)
-
-    # Show the figure
-    fig.to_html()
-    plot_div = fig.to_html(full_html=False)
-
-    # Embed the plot div in an HTML response
-    html_content = f"""
-    <html>
-        <head>
-            <title>Saint Paër chauffage</title>
-            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        </head>
-        <body>
-            <h1>Saint Paër chauffage</h1>
-            {plot_div}
-        </body>
-    </html>
-    """
-
-    return HTMLResponse(content=html_content)
