@@ -5,14 +5,9 @@ from fastapi import FastAPI
 from sonde import sondes
 from config import favicon_path
 from fastapi.responses import FileResponse
-
+from plots import plot_router
 
 logger = logging.getLogger("server")
-
-
-def open_last_n_rows(file_path, n):
-    with open(file_path, "r") as file:
-        return file.readlines()[-n:]
 
 
 @asynccontextmanager
@@ -22,6 +17,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(plot_router)
 
 
 @app.get("/temperature/{sonde_number}")
@@ -37,4 +33,3 @@ async def get_temp(sonde_number: int):
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse(favicon_path)
-

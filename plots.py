@@ -2,13 +2,15 @@ import datetime
 
 import pandas as pd
 import plotly.graph_objects as go
+from fastapi import APIRouter
 from starlette.responses import HTMLResponse
 
 from config import data_path
-from server import app
+
+plot_router = APIRouter(prefix="/plot", tags=["plot"])
 
 
-@app.get("/plot")
+@plot_router.get("/")
 async def plot(date: str = None):
     if date is None:
         date = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -79,7 +81,7 @@ async def plot(date: str = None):
     return HTMLResponse(content=html_content)
 
 
-@app.get("/plot/external")
+@plot_router.get("/external")
 async def plot(date: str = None):
     if date is None:
         date = datetime.datetime.now().strftime("%Y-%m-%d")
