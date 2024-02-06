@@ -43,30 +43,48 @@ async def favicon():
 
 
 @app.get("/plot")
-async def plot(date: str = datetime.datetime.now().strftime("%Y-%m-%d")):
-    temps_df = pd.read_csv(data_path + f"{date}.csv",
-                           names=("time", "temperature_out", "external_temperature", "wanted_temperature", "control"),
-                           header=None, sep=",")
+async def plot(date: str = None):
+    if date is None:
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+    temps_df = pd.read_csv(
+        data_path + f"{date}.csv",
+        names=(
+            "time",
+            "temperature_out",
+            "external_temperature",
+            "wanted_temperature",
+            "control",
+        ),
+        header=None,
+        sep=",",
+    )
     temps_df["parsed_datetime"] = pd.to_datetime(temps_df["time"])
-        # Convert the Plotly figure to an HTML div
     # Create a bar trace for control values with increased transparency
     trace3 = go.Bar(
         x=temps_df["parsed_datetime"],
         y=temps_df["control"],
         name="Control",
         yaxis="y2",
-        marker=dict(color="rgba(255, 0, 0, 0.3)")
+        marker=dict(color="rgba(255, 0, 0, 0.3)"),
     )
 
     # Create a line trace for temperature values
-    trace1 = go.Scatter(x=temps_df["parsed_datetime"], y=temps_df["temperature_out"], mode="lines",
-                        name="Temperature Out")
-    trace2 = go.Scatter(x=temps_df["parsed_datetime"], y=temps_df["wanted_temperature"], mode="lines",
-                        name="Wanted Temperature")
+    trace1 = go.Scatter(
+        x=temps_df["parsed_datetime"],
+        y=temps_df["temperature_out"],
+        mode="lines",
+        name="Temperature Out",
+    )
+    trace2 = go.Scatter(
+        x=temps_df["parsed_datetime"],
+        y=temps_df["wanted_temperature"],
+        mode="lines",
+        name="Wanted Temperature",
+    )
 
     # Create layout with two y-axes
     layout = go.Layout(
-        title="Temperature and Control Comparison",
+        title="Temperature eau et temperature voulue",
         yaxis=dict(title="Temperature"),
         yaxis2=dict(title="Control", overlaying="y", side="right"),
     )
@@ -82,11 +100,11 @@ async def plot(date: str = datetime.datetime.now().strftime("%Y-%m-%d")):
     html_content = f"""
     <html>
         <head>
-            <title>Interactive Temperature and Control Plot</title>
+            <title>Saint Paër chauffage</title>
             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         </head>
         <body>
-            <h1>Interactive Temperature and Control Plot</h1>
+            <h1>Saint Paër chauffage</h1>
             {plot_div}
         </body>
     </html>

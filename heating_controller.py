@@ -35,7 +35,9 @@ class Valve(object):
 
 def write_row_to_csv(row):
     now = datetime.datetime.now()
-    csv_file_name = "/home/pi/Documents/raspberry_heating/data/" + now.strftime("%Y-%m-%d") + ".csv"
+    csv_file_name = (
+        "/home/pi/Documents/raspberry_heating/data/" + now.strftime("%Y-%m-%d") + ".csv"
+    )
     with open(csv_file_name, "a") as f_object:
         writer_object = writer(f_object)
         writer_object.writerow(row)
@@ -44,13 +46,13 @@ def write_row_to_csv(row):
 
 class HeatingController:
     def __init__(
-            self,
-            output_sensor: Sonde,
-            external_sensor: Sonde,
-            valve: Valve,
-            tolerance: int = 0.7,
-            coefficient: int = 1.4,
-            command: int = 50
+        self,
+        output_sensor: Sonde,
+        external_sensor: Sonde,
+        valve: Valve,
+        tolerance: int = 0.7,
+        coefficient: int = 1.4,
+        command: int = 50,
     ):
         self.__output_sensor = output_sensor
         self.__external_sensor = external_sensor
@@ -58,7 +60,9 @@ class HeatingController:
         self.__tolerance = tolerance
         self.__coefficient = coefficient
         self.__command = command
-        wanted_temperature = heating_curve(external_sensor.get_temperature() / 1000, coefficient, command)
+        wanted_temperature = heating_curve(
+            external_sensor.get_temperature() / 1000, coefficient, command
+        )
         self.__pid = PID(
             1,
             0.5,
@@ -73,9 +77,9 @@ class HeatingController:
         output_temp = self.__output_sensor.get_temperature() / 1000
         pid_control = self.__pid(output_temp)
         outside_temperature = self.__external_sensor.get_temperature() / 1000
-        wanted_temperature = heating_curve(outside_temperature,
-                                           self.__coefficient,
-                                           self.__command)
+        wanted_temperature = heating_curve(
+            outside_temperature, self.__coefficient, self.__command
+        )
         self.__pid.setpoint = wanted_temperature
         # This means we are close to the wanted temperature, no need to use PID control
         if abs(output_temp - wanted_temperature) <= self.__tolerance:
@@ -92,7 +96,11 @@ class HeatingController:
 
     def log_and_save_data(self, output_temp, external_temp, control):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        wanted_temperature = heating_curve(external_temp, self.__coefficient, self.__command)
-        print(f"{now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control}")
+        wanted_temperature = heating_curve(
+            external_temp, self.__coefficient, self.__command
+        )
+        print(
+            f"{now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control}"
+        )
         csv_row = [now_str, output_temp, external_temp, wanted_temperature, control]
         write_row_to_csv(csv_row)

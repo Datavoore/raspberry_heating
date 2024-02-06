@@ -18,5 +18,7 @@ def run_main_loop():
 
 
 if __name__ == "__main__":
-    print("Date/time | Output Temperature | External Temperature | Wanted Temperature | Control Value (time to open valve)")
+    print(
+        "Date/time | Output Temperature | External Temperature | Wanted Temperature | Control Value (time to open valve)"
+    )
     run_main_loop()
