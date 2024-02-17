@@ -1,7 +1,7 @@
 import datetime
 import time
 
-from sonde import Sonde
+from probe import Probe
 from simple_pid import PID
 from csv import writer
 import RPi.GPIO as GPIO
@@ -51,8 +51,8 @@ def write_row_to_csv(row):
 class HeatingController:
     def __init__(
         self,
-        output_sensor: Sonde,
-        external_sensor: Sonde,
+        output_sensor: Probe,
+        external_sensor: Probe,
         valve: Valve,
         tolerance: int = 0.7,
         coefficient: int = 1.4,

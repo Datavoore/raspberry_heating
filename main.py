@@ -2,11 +2,11 @@ import time
 
 from config import relay_lower_pin_num, relay_raise_pin_num
 from heating_controller import HeatingController, Valve
-from sonde import sondes
+from probe import probes
 
 heating_controller = HeatingController(
-    output_sensor=sondes[2],
-    external_sensor=sondes[1],
+    output_sensor=probes[2],
+    external_sensor=probes[1],
     valve=Valve(relay_lower_pin_num, relay_raise_pin_num),
 )
 

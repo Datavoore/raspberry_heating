@@ -1,8 +1,7 @@
 import logging
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-from sonde import sondes
+from probe import probes
 from config import favicon_path
 from fastapi.responses import FileResponse
 from plots import plot_router
@@ -10,24 +9,18 @@ from plots import plot_router
 logger = logging.getLogger("server")
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info("Running server")
-    yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 app.include_router(plot_router)
 
 
-@app.get("/temperature/{sonde_number}")
-async def get_temp(sonde_number: int):
-    sonde = sondes.get(sonde_number)
-    if sonde:
-        temperature = sonde.get_temperature()
-        return {f"Température Sonde {sonde_number}": temperature}
+@app.get("/temperature/{probe_number}")
+async def get_temp(probe_number: int):
+    probe = probes.get(probe_number)
+    if probe:
+        temperature = probe.get_temperature()
+        return {f"Température Probe {probe_number}": temperature}
     else:
-        return {f"Sonde not found"}
+        return {f"Probe not found"}
 
 
 @app.get("/favicon.ico", include_in_schema=False)
