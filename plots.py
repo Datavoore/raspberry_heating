@@ -65,6 +65,28 @@ def get_main_graph(temps_df):
     return plot_div
 
 
+def get_external_temperature_graph(temps_df):
+    trace1 = go.Scatter(
+        x=temps_df["parsed_datetime"],
+        y=temps_df["external_temperature"],
+        mode="lines",
+        name="Température extérieure",
+    )
+
+    # Create layout with two y-axes
+    layout = go.Layout(
+        title="Température extérieure",
+        yaxis=dict(title="Température"),
+    )
+
+    # Create a figure with the defined traces and layout
+    fig = go.Figure(data=[trace1], layout=layout)
+
+    # Show the figure
+    plot_div = fig.to_html(full_html=False)
+    return plot_div
+
+
 @plot_router.get("/")
 async def plot(date: str = None):
     if date is None:
@@ -93,51 +115,16 @@ async def plot(date: str = None):
 async def plot(date: str = None):
     if date is None:
         date = datetime.datetime.now().strftime("%Y-%m-%d")
-    temps_df = pd.read_csv(
-        data_path + f"{date}.csv",
-        names=(
-            "time",
-            "temperature_out",
-            "external_temperature",
-            "wanted_temperature",
-            "control",
-        ),
-        header=None,
-        sep=",",
-    )
-    temps_df["parsed_datetime"] = pd.to_datetime(temps_df["time"])
-    # Create a bar trace for control values with increased transparency
-
-    # Create a line trace for temperature values
-    trace1 = go.Scatter(
-        x=temps_df["parsed_datetime"],
-        y=temps_df["external_temperature"],
-        mode="lines",
-        name="Température extérieure",
-    )
-
-    # Create layout with two y-axes
-    layout = go.Layout(
-        title="Température extérieure",
-        yaxis=dict(title="Température"),
-    )
-
-    # Create a figure with the defined traces and layout
-    fig = go.Figure(data=[trace1], layout=layout)
-
-    # Show the figure
-    fig.to_html()
-    plot_div = fig.to_html(full_html=False)
-
-    # Embed the plot div in an HTML response
+    temps_df = load_csv(date)
+    plot_div = get_external_temperature_graph(temps_df)
     html_content = f"""
     <html>
         <head>
-            <title>Saint Paër température extérieure</title>
+            <title>Saint Paër température extérieure {date}</title>
             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         </head>
         <body>
-            <h1>Saint Paër température extérieure</h1>
+            <h1>Saint Paër température extérieure {date}</h1>
             {plot_div}
         </body>
     </html>
