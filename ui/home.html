@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classy Links with Temperature</title>
+  <title>Chauffage Saint-Paër</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -44,50 +44,51 @@
     }
     .temperature {
       text-align: center;
+      margin-bottom: 20px;
+    }
+    .separator {
+      border-top: 1px solid #ccc;
       margin-top: 20px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Classy Links with Temperature</h1>
+  <h1>Chauffage Saint-Paër</h1>
+  <div class="temperature" id="temperatureDisplay1"></div>
+  <div class="temperature" id="temperatureDisplay2"></div>
+  <div class="separator"></div>
   <ul>
-    <li><a href="#" id="temperatureLink1">Temperature Probe 1</a></li>
-    <li><a href="#" id="temperatureLink2">Temperature Probe 2</a></li>
+    <li><a href="#" id="link1">Graphique d'aujourd'hui</a></li>
+    <li><a href="#" id="link2">Graphique d'hier</a></li>
+    <li><a href="#" id="link3">30 dernières minutes</a></li>
+    <li><a href="#" id="link4">3 dernières heures</a></li>
   </ul>
-  <div class="temperature" id="temperatureDisplay"></div>
 </div>
 
 <script>
   // Function to fetch temperature from the given URL
-  function fetchTemperature(url, probeNumber) {
+  function fetchTemperature(url, probeNumber, sondeName) {
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        const temperature = data["Temperature Probe"];
-        document.getElementById("temperatureDisplay").innerHTML = `Temperature Probe ${probeNumber}: ${temperature} degrees`;
+        let temperature = data["Temperature Probe"];
+        temperature = temperature / 1000;
+        document.getElementById(`temperatureDisplay${probeNumber}`).innerHTML = `Température sonde ${sondeName}: ${temperature} degrés`;
       })
       .catch(error => {
         console.error('Error fetching temperature:', error);
-        document.getElementById("temperatureDisplay").innerHTML = "Failed to fetch temperature data";
+        document.getElementById(`temperatureDisplay${probeNumber}`).innerHTML = "Failed to fetch temperature data";
       });
   }
 
-  // Update temperature when links are clicked
-  document.getElementById("temperatureLink1").addEventListener("click", function(event) {
-    event.preventDefault();
-    fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/1', 1);
+  // Fetch temperatures when the page loads
+  window.addEventListener('load', () => {
+    fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/1', 1, 'extérieure'); // Fetching temperature for probe 1
+    fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/2', 2, 'radiateur'); // Fetching temperature for probe 2
   });
-
-  document.getElementById("temperatureLink2").addEventListener("click", function(event) {
-    event.preventDefault();
-    fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/2', 2);
-  });
-
-  // Fetch initial temperature
-  fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/1', 1); // Fetching initial temperature for probe 1
-  fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/2', 2); // Fetching initial temperature for probe 2
 </script>
 
 </body>
