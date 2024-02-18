@@ -125,7 +125,7 @@ async def plot(date: str = None, subset: str = None):
 @plot_router.get("/external")
 async def plot(date: str = None, subset: str = None):
     temps_df = get_filtered_csv(date, subset)
-    plot_div = get_main_graph(temps_df)
+    plot_div = get_external_temperature_graph(temps_df)
 
     html_content = f"""
     <html>
