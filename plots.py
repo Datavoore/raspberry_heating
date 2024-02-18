@@ -10,12 +10,13 @@ from config import data_path
 plot_router = APIRouter(prefix="/plot", tags=["plot"])
 timedeltas = {"15m": datetime.timedelta(minutes=15),
               "3h": datetime.timedelta(hours=3)}
+date_format = "%Y-%m-%d"
 
 
 def get_filtered_csv(date, subset):
     now = datetime.datetime.now()
     if date is None:
-        date = now.strftime("%Y-%m-%d")
+        date = now.strftime(date_format)
     temps_df = load_csv(date)
     if subset and subset in timedeltas:
         timedelta = timedeltas[subset]
@@ -124,8 +125,8 @@ async def plot(date: str = None, subset: str = None):
 
 @plot_router.get("/yesterday")
 async def plot_yesterday():
-    date = datetime.datetime.now() - datetime.timedelta(days=1)
-    return plot(date)
+    date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime(date_format)
+    return await plot(date)
 
 
 @plot_router.get("/external")
