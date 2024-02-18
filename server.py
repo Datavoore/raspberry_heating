@@ -18,7 +18,7 @@ async def get_temp(probe_number: int):
     probe = probes.get(probe_number)
     if probe:
         temperature = probe.get_temperature()
-        return {f"Température Probe {probe_number}": temperature}
+        return {f"Temperature Probe": temperature}
     else:
         return {f"Probe not found"}
 
