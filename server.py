@@ -1,6 +1,7 @@
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from probe import probes
 from config import favicon_path
@@ -8,7 +9,6 @@ from fastapi.responses import FileResponse
 from plots import plot_router
 
 logger = logging.getLogger("server")
-
 
 app = FastAPI()
 
@@ -26,6 +26,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount the 'ui' directory as a static directory
+app.mount("/ui", StaticFiles(directory="ui"), name="ui")
+
+
+# Route to serve the home.html file
+@app.get("/")
+async def get_home():
+    return FileResponse("ui/home.html")
+
 
 app.include_router(plot_router)
 
@@ -42,4 +51,4 @@ async def get_temp(probe_number: int):
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    return FileResponse(favicon_path)
+    return FileResponse("ui/heating.png")

@@ -8,7 +8,7 @@ from starlette.responses import HTMLResponse
 from config import data_path
 
 plot_router = APIRouter(prefix="/plot", tags=["plot"])
-timedeltas = {"15m": datetime.timedelta(minutes=15),
+timedeltas = {"30m": datetime.timedelta(minutes=30),
               "3h": datetime.timedelta(hours=3)}
 date_format = "%Y-%m-%d"
 
