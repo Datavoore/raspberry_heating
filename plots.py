@@ -8,6 +8,19 @@ from starlette.responses import HTMLResponse
 from config import data_path
 
 plot_router = APIRouter(prefix="/plot", tags=["plot"])
+timedeltas = {"15m": datetime.timedelta(minutes=15),
+              "3h": datetime.timedelta(hours=3)}
+
+
+def get_filtered_csv(date, subset):
+    now = datetime.datetime.now()
+    if date is None:
+        date = now.strftime("%Y-%m-%d")
+    temps_df = load_csv(date)
+    if subset and subset in timedeltas:
+        timedelta = timedeltas[subset]
+        temps_df = temps_df[temps_df["parsed_datetime"] >= now - timedelta]
+    return temps_df
 
 
 def load_csv(date):
@@ -88,10 +101,8 @@ def get_external_temperature_graph(temps_df):
 
 
 @plot_router.get("/")
-async def plot(date: str = None):
-    if date is None:
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-    temps_df = load_csv(date)
+async def plot(date: str = None, subset: str = None):
+    temps_df = get_filtered_csv(date, subset)
     plot_div = get_main_graph(temps_df)
 
     # Embed the plot div in an HTML response
@@ -112,11 +123,10 @@ async def plot(date: str = None):
 
 
 @plot_router.get("/external")
-async def plot(date: str = None):
-    if date is None:
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-    temps_df = load_csv(date)
-    plot_div = get_external_temperature_graph(temps_df)
+async def plot(date: str = None, subset: str = None):
+    temps_df = get_filtered_csv(date, subset)
+    plot_div = get_main_graph(temps_df)
+
     html_content = f"""
     <html>
         <head>
