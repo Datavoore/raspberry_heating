@@ -122,6 +122,12 @@ async def plot(date: str = None, subset: str = None):
     return HTMLResponse(content=html_content)
 
 
+@plot_router.get("/yesterday")
+async def plot_yesterday():
+    date = datetime.datetime.now() - datetime.timedelta(days=1)
+    return plot(date)
+
+
 @plot_router.get("/external")
 async def plot(date: str = None, subset: str = None):
     temps_df = get_filtered_csv(date, subset)
