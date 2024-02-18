@@ -130,7 +130,7 @@ async def plot_yesterday():
 
 
 @plot_router.get("/external")
-async def plot(date: str = None, subset: str = None):
+async def plot_external(date: str = None, subset: str = None):
     temps_df = get_filtered_csv(date, subset)
     plot_div = get_external_temperature_graph(temps_df)
 
