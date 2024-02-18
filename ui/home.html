@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classy Links</title>
+  <title>Classy Links with Temperature</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,20 +42,53 @@
     a:hover {
       background-color: #e9e9e9;
     }
+    .temperature {
+      text-align: center;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Chauffage Saint-Paër</h1>
+  <h1>Classy Links with Temperature</h1>
   <ul>
-    <li><a href="http://saintpaer.servebeer.com:8042/temperature/1">Temp 1</a></li>
-    <li><a href="#">Link 2</a></li>
-    <li><a href="#">Link 3</a></li>
-    <li><a href="#">Link 4</a></li>
-    <li><a href="#">Link 5</a></li>
+    <li><a href="#" id="temperatureLink1">Temperature Probe 1</a></li>
+    <li><a href="#" id="temperatureLink2">Temperature Probe 2</a></li>
   </ul>
+  <div class="temperature" id="temperatureDisplay"></div>
 </div>
+
+<script>
+  // Function to fetch temperature from the given URL
+  function fetchTemperature(url, probeNumber) {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const temperature = data["Temperature Probe"];
+        document.getElementById("temperatureDisplay").innerHTML = `Temperature Probe ${probeNumber}: ${temperature} degrees`;
+      })
+      .catch(error => {
+        console.error('Error fetching temperature:', error);
+        document.getElementById("temperatureDisplay").innerHTML = "Failed to fetch temperature data";
+      });
+  }
+
+  // Update temperature when links are clicked
+  document.getElementById("temperatureLink1").addEventListener("click", function(event) {
+    event.preventDefault();
+    fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/1', 1);
+  });
+
+  document.getElementById("temperatureLink2").addEventListener("click", function(event) {
+    event.preventDefault();
+    fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/2', 2);
+  });
+
+  // Fetch initial temperature
+  fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/1', 1); // Fetching initial temperature for probe 1
+  fetchTemperature('http://saintpaer.servebeer.com:8042/temperature/2', 2); // Fetching initial temperature for probe 2
+</script>
 
 </body>
 </html>
