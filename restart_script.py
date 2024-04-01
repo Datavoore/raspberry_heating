@@ -6,7 +6,7 @@ found_serv, found_main = False, False
 for process in psutil.process_iter():
     if 'server:app' in process.cmdline():
         found_serv = True
-    if 'main.py' in process.cmdline():
+    if '/home/pi/Documents/raspberry_heating/main.py' in process.cmdline():
         found_main = True
 
 if not found_serv:
