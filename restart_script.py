@@ -15,5 +15,4 @@ if not found_serv:
 if not found_main:
     print("Main not running, starting it")
     subprocess.Popen(
-        ['nohup', 'python3', '/home/pi/Documents/raspberry_heating/main.py', '>', '/home/pi/logs/main_py_logs.txt',
-         '&'])
+        ['nohup', 'python3', '/home/pi/Documents/raspberry_heating/main.py'])
