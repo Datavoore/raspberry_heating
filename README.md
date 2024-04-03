@@ -6,6 +6,7 @@ Heating system is a wood stove with a water tank and a pump. The pump is control
 
 ## Hardware
 
+
 - Raspberry Pi 3
 - DS18B20 temperature sensor
 - 220V Relay module
