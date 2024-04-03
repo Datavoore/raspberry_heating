@@ -8,6 +8,7 @@ logger = logging.getLogger("probe")
 pattern = r"t=(\d+)"
 
 
+
 def parse_temperature_as_int(probe_file_content):
     match = re.search(pattern, probe_file_content)
     if match:
