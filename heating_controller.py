@@ -39,9 +39,7 @@ class Valve(object):
 
 def write_row_to_csv(row):
     now = datetime.datetime.now()
-    csv_file_name = (
-        data_path + now.strftime("%Y-%m-%d") + ".csv"
-    )
+    csv_file_name = data_path + now.strftime("%Y-%m-%d") + ".csv"
     with open(csv_file_name, "a") as f_object:
         writer_object = writer(f_object)
         writer_object.writerow(row)
