@@ -5,7 +5,7 @@ from config import probes_paths
 
 logger = logging.getLogger("probe")
 
-pattern = r"t=(\d+)"
+pattern = r"t=(\d+|-\d+|)"
 
 
 def parse_temperature_as_int(probe_file_content):
