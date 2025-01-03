@@ -1,0 +1,21 @@
+# Dockerfile.controller
+FROM python:3.9
+
+WORKDIR /app
+
+# Copy necessary files
+COPY . .
+# If your Probe class or config needs other files, copy them too
+
+# Install dependencies
+# Create a requirements.txt for this service or list them here
+# For example:
+# RUN pip install simple_pid RPi.GPIO
+# You'll need to create a requirements_controller.txt containing:
+# simple_pid
+# RPi.GPIO
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Command to run the application
+CMD ["python3", "main.py"]

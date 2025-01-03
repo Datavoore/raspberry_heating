@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  heating-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.controller
+    container_name: heating_controller_app
+    restart: unless-stopped
+    privileged: true  # REQUIRED for RPi.GPIO access
+    # Alternatively, map specific devices if you know them, but privileged is easier for GPIO:
+    # devices:
+    #   - "/dev/gpiomem:/dev/gpiomem"
+    #   - "/dev/gpiochip0:/dev/gpiochip0" # etc.
+    volumes:
+      - ./data:/home/pi/Documents/raspberry_heating/data/  # Map your CSV data directory
+      # Volume for 1-Wire sensors if probe.py uses them
+      - /sys/bus/w1/devices:/sys/bus/w1/devices
+    # You might need to pass configuration from config.py via environment variables
+    # environment:
+    #   - DATA_PATH=/app/data_from_config
+    #   - RELAY_LOWER_PIN_NUM=your_pin
+    #   - RELAY_RAISE_PIN_NUM=your_other_pin
+    # Then adapt your Python code in config.py or directly in main.py to read these
+    # e.g., data_path = os.getenv("DATA_PATH", "/app/default_data_path")
+
+  api-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: heating_api_server_app
+    restart: unless-stopped
+    ports:
+      - "8042:8042" # Map host port 8042 to container port 8042
+    volumes:
+      # If probe.py in the server also reads directly from 1-Wire sensors
+      - /sys/bus/w1/devices:/sys/bus/w1/devices
+    depends_on:
+      - heating-controller # Optional: if API needs controller to be up first, though they are somewhat decoupled

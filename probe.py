@@ -11,7 +11,9 @@ pattern = r"t=(\d+|-\d+|)"
 def parse_temperature_as_int(probe_file_content):
     match = re.search(pattern, probe_file_content)
     if match:
+        print("Found in file :", str(match.group(1)))
         extracted_number = int(match.group(1))
+        print("Converted :", int(match.group(1)))
         return extracted_number
     else:
         raise ValueError("Temperature not found in file")
