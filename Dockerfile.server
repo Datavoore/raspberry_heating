@@ -4,7 +4,6 @@ FROM python:3.9
 WORKDIR /app
 
 # Copy necessary files
-COPY . .
 # If your Probe class needs other files, copy them too
 
 # Install dependencies
@@ -13,6 +12,7 @@ COPY . .
 # uvicorn[standard] # [standard] includes performance parts
 # starlette # Often a direct or indirect dependency
 RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 
 # Expose the port the app runs on
 EXPOSE 8042

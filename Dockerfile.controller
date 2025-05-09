@@ -4,7 +4,6 @@ FROM python:3.9
 WORKDIR /app
 
 # Copy necessary files
-COPY . .
 # If your Probe class or config needs other files, copy them too
 
 # Install dependencies
@@ -16,6 +15,7 @@ COPY . .
 # RPi.GPIO
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 
 # Command to run the application
 CMD ["python3", "main.py"]

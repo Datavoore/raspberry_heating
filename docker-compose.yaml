@@ -16,6 +16,8 @@ services:
       - ./data:/home/pi/Documents/raspberry_heating/data/  # Map your CSV data directory
       # Volume for 1-Wire sensors if probe.py uses them
       - /sys/bus/w1/devices:/sys/bus/w1/devices
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     # You might need to pass configuration from config.py via environment variables
     # environment:
     #   - DATA_PATH=/app/data_from_config
@@ -35,5 +37,6 @@ services:
     volumes:
       # If probe.py in the server also reads directly from 1-Wire sensors
       - /sys/bus/w1/devices:/sys/bus/w1/devices
-    depends_on:
-      - heating-controller # Optional: if API needs controller to be up first, though they are somewhat decoupled
+      - ./data:/home/pi/Documents/raspberry_heating/data/  # Map your CSV data directory
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro

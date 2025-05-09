@@ -1,5 +1,6 @@
 simple-pid==2.0.0
 fastapi==0.109.2
+uvicorn
 pandas==2.2.0
 plotly==5.19.0
 RPi.GPIO==0.7.1
