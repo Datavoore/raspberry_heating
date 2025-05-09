@@ -102,7 +102,7 @@ class HeatingController:
             external_temp, self.__coefficient, self.__command
         )
         print(
-            f"{now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control}"
+            f"| {now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control}} |"
         )
         csv_row = [now_str, output_temp, external_temp, wanted_temperature, control]
         write_row_to_csv(csv_row)
