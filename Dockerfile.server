@@ -11,6 +11,7 @@ WORKDIR /app
 # fastapi
 # uvicorn[standard] # [standard] includes performance parts
 # starlette # Often a direct or indirect dependency
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
