@@ -40,8 +40,8 @@ def update_command_state_file(controller_on: bool = None, command_override: int 
     temp_file_path = file_path + ".tmp"
 
     to_update_state = get_current_state()
-    if controller_on:
-        to_update_state["command_override"] = command_override
+    if controller_on is not None:
+        to_update_state["controller_on"] = controller_on
     if command_override:
         to_update_state["command_override"] = command_override
 
