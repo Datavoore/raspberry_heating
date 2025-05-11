@@ -40,16 +40,16 @@ class Valve(object):
         GPIO.output(self.__raise_pin, 0)
 
 class Pump(object):
-    def __init__(self, pin_number):
+    def __init__(self, pin_number, state):
         self.__pin_number = pin_number
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_number, GPIO.OUT)
-        GPIO.output(pin_number, 1)
-        self.__state = True
+        self.__state = state
+        GPIO.output(pin_number, int(state))
 
     def set_state(self, new_state: bool):
         if new_state != self.__state:
-            GPIO.output(self.__pin_number, int(not new_state))
+            GPIO.output(self.__pin_number, int(new_state))
             self.__state = new_state
 
 def write_row_to_csv(row):

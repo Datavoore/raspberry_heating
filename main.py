@@ -5,12 +5,13 @@ from heating_controller import HeatingController, Valve, Pump
 from probe import probes, Probe
 from command_override_utils import get_current_state
 
-command_override = get_current_state()['command_override']
+state = get_current_state()
+command_override, is_on = state['command_override'], state['controller_on']
 heating_controller = HeatingController(
     output_sensor=probes[2],
     external_sensor=probes[1],
     valve=Valve(relay_lower_pin_num, relay_raise_pin_num),
-    pump=Pump(relay_pump),
+    pump=Pump(relay_pump,is_on),
     command=command_override
 )
 
