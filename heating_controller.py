@@ -1,12 +1,12 @@
 import datetime
 import time
 
-from command_override_utils import get_command_override
+from command_override_utils import get_current_state
 from probe import Probe
 from simple_pid import PID
 from csv import writer
 import RPi.GPIO as GPIO
-from config import relay_lower_pin_num, relay_raise_pin_num, data_path
+from config import relay_lower_pin_num, relay_raise_pin_num, relay_pump, data_path
 import logging
 
 logger = logging.getLogger("heating_controller")
@@ -39,6 +39,18 @@ class Valve(object):
         time.sleep(time_interval)
         GPIO.output(self.__raise_pin, 0)
 
+class Pump(object):
+    def __init__(self, pin_number):
+        self.__pin_number = pin_number
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(pin_number, GPIO.OUT)
+        GPIO.output(pin_number, 1)
+        self.__state = True
+
+    def set_state(self, state: bool):
+        if state != self.__state:
+            GPIO.output(self.__pin_number, int(state))
+            self.__state = state
 
 def write_row_to_csv(row):
     now = datetime.datetime.now()
@@ -55,6 +67,7 @@ class HeatingController:
         output_sensor: Probe,
         external_sensor: Probe,
         valve: Valve,
+        pump: Pump,
         tolerance: int = 0.7,
         coefficient: int = 1.4,
         command: int = 50,
@@ -62,6 +75,7 @@ class HeatingController:
         self.__output_sensor = output_sensor
         self.__external_sensor = external_sensor
         self.__valve = valve
+        self.__pump = pump
         self.__tolerance = tolerance
         self.__coefficient = coefficient
         self.__command = command
@@ -82,28 +96,37 @@ class HeatingController:
         output_temp = self.__output_sensor.get_temperature() / 1000
         pid_control = self.__pid(output_temp)
         outside_temperature = self.__external_sensor.get_temperature() / 1000
-        command = get_command_override()
-        wanted_temperature = heating_curve(
-            outside_temperature, self.__coefficient, command
-        )
-        self.__command = command
-        self.__pid.setpoint = wanted_temperature
-        # This means we are close to the wanted temperature, no need to use PID control
-        if abs(output_temp - wanted_temperature) <= self.__tolerance:
-            control_value = 0
-        else:
-            control_value = pid_control
+        state = get_current_state()
+        is_on, command = state["is_on"], state["command"]
+        if is_on:
+            wanted_temperature = heating_curve(
+                outside_temperature, self.__coefficient, command
+            )
+            self.__command = command
+            self.__pid.setpoint = wanted_temperature
+            # This means we are close to the wanted temperature, no need to use PID control
+            if abs(output_temp - wanted_temperature) <= self.__tolerance:
+                control_value = 0
+            else:
+                control_value = pid_control
 
-        if control_value > 0:
-            self.__valve.raise_valve(control_value)
-        elif control_value < 0:
-            self.__valve.lower_valve(-control_value)
+            if control_value > 0:
+                self.__valve.raise_valve(control_value)
+            elif control_value < 0:
+                self.__valve.lower_valve(-control_value)
+        else:
+            control_value = 0
+
+        # Setting here everytime is fine because function checks for state change
+        self.__pump.set_state(is_on)
 
         self.log_and_save_data(output_temp, outside_temperature, control_value)
 
     def log_and_save_data(self, output_temp, external_temp, control):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        command = self.__command
+        state = get_current_state()
+        is_on, command = state["is_on"], state["command"]
+
         wanted_temperature = heating_curve(
             external_temp, self.__coefficient, command
         )

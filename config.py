@@ -1,5 +1,6 @@
 relay_lower_pin_num = 17
 relay_raise_pin_num = 27
+relay_pump = 5
 
 w1_path = "/sys/bus/w1/devices/"
 
