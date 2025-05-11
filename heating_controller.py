@@ -45,11 +45,11 @@ class Pump(object):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_number, GPIO.OUT)
         self.__state = state
-        GPIO.output(pin_number, int(state))
+        GPIO.output(pin_number, int(not state))
 
     def set_state(self, new_state: bool):
         if new_state != self.__state:
-            GPIO.output(self.__pin_number, int(new_state))
+            GPIO.output(self.__pin_number, int(not new_state))
             self.__state = new_state
 
 def write_row_to_csv(row):
