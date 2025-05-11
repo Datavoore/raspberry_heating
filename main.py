@@ -10,7 +10,7 @@ heating_controller = HeatingController(
     output_sensor=probes[2],
     external_sensor=probes[1],
     valve=Valve(relay_lower_pin_num, relay_raise_pin_num),
-    pump=Pump(Valve),
+    pump=Pump(relay_pump),
     command=command_override
 )
 
