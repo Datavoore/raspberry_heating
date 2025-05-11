@@ -6,7 +6,7 @@ from probe import Probe
 from simple_pid import PID
 from csv import writer
 import RPi.GPIO as GPIO
-from config import relay_lower_pin_num, relay_raise_pin_num, relay_pump, data_path
+from config import relay_lower_pin_num, relay_raise_pin_num, data_path
 import logging
 
 logger = logging.getLogger("heating_controller")
@@ -97,7 +97,7 @@ class HeatingController:
         pid_control = self.__pid(output_temp)
         outside_temperature = self.__external_sensor.get_temperature() / 1000
         state = get_current_state()
-        is_on, command = state["is_on"], state["command"]
+        is_on, command = state["controller_on"], state["command_override"]
         if is_on:
             wanted_temperature = heating_curve(
                 outside_temperature, self.__coefficient, command
@@ -125,7 +125,7 @@ class HeatingController:
     def log_and_save_data(self, output_temp, external_temp, control):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         state = get_current_state()
-        is_on, command = state["is_on"], state["command"]
+        is_on, command = state["controller_on"], state["command_override"]
 
         wanted_temperature = heating_curve(
             external_temp, self.__coefficient, command

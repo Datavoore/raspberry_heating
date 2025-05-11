@@ -61,11 +61,12 @@ class SetCommandRequest(BaseModel):
 # Endpoint to get the current command override
 @app.get("/command-override")
 async def get_command_override_route():
-    current_value = get_command_override()
-    if current_value is None:
+    current_state = get_current_state()
+    command_override = current_state["command_override"]
+    if command_override is None:
         # Indicate that the value is not set or couldn't be read
          return {"command_override": None} # Or a specific error structure
-    return {"command_override": current_value}
+    return {"command_override": command_override}
 
 # Endpoint to set the command override
 @app.post("/command-override")
