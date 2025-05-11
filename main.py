@@ -3,11 +3,14 @@ import time
 from config import relay_lower_pin_num, relay_raise_pin_num
 from heating_controller import HeatingController, Valve
 from probe import probes
+from command_override_utils import get_command_override
 
+command_override = get_command_override()
 heating_controller = HeatingController(
     output_sensor=probes[2],
     external_sensor=probes[1],
     valve=Valve(relay_lower_pin_num, relay_raise_pin_num),
+    command=command_override
 )
 
 

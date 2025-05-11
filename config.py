@@ -10,3 +10,10 @@ probes_paths = [
 favicon_path = "/home/pi/Pictures/favicon.ico"
 
 data_path = "/home/pi/Documents/raspberry_heating/data/"
+
+COMMAND_OVERRIDE_DIR = "/app/config_overrides"  # Directory for override files
+COMMAND_OVERRIDE_FILENAME = "command_setting.json"
+COMMAND_OVERRIDE_FILE_PATH = f"{COMMAND_OVERRIDE_DIR}/{COMMAND_OVERRIDE_FILENAME}"
+
+# Default command value if no override is set or file is invalid
+DEFAULT_HEATING_COMMAND = 50

@@ -32,6 +32,7 @@ def load_csv(date):
             "external_temperature",
             "wanted_temperature",
             "control",
+            "command"
         ),
         header=None,
         sep=",",

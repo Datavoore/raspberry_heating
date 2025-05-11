@@ -18,6 +18,7 @@ services:
       - /sys/bus/w1/devices:/sys/bus/w1/devices
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - ./config_overrides:/app/config_overrides # New volume for overrides
     # You might need to pass configuration from config.py via environment variables
     # environment:
     #   - DATA_PATH=/app/data_from_config
@@ -40,3 +41,4 @@ services:
       - ./data:/home/pi/Documents/raspberry_heating/data/  # Map your CSV data directory
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - ./config_overrides:/app/config_overrides # New volume for overrides

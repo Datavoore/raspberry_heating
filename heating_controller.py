@@ -1,12 +1,15 @@
 import datetime
 import time
 
+from command_override_utils import get_command_override
 from probe import Probe
 from simple_pid import PID
 from csv import writer
 import RPi.GPIO as GPIO
 from config import relay_lower_pin_num, relay_raise_pin_num, data_path
+import logging
 
+logger = logging.getLogger("heating_controller")
 
 def heating_curve(external_temperature, coefficient, command):
     now = datetime.datetime.now()
@@ -79,9 +82,11 @@ class HeatingController:
         output_temp = self.__output_sensor.get_temperature() / 1000
         pid_control = self.__pid(output_temp)
         outside_temperature = self.__external_sensor.get_temperature() / 1000
+        command = get_command_override()
         wanted_temperature = heating_curve(
-            outside_temperature, self.__coefficient, self.__command
+            outside_temperature, self.__coefficient, command
         )
+        self.__command = command
         self.__pid.setpoint = wanted_temperature
         # This means we are close to the wanted temperature, no need to use PID control
         if abs(output_temp - wanted_temperature) <= self.__tolerance:
@@ -98,11 +103,12 @@ class HeatingController:
 
     def log_and_save_data(self, output_temp, external_temp, control):
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        command = self.__command
         wanted_temperature = heating_curve(
-            external_temp, self.__coefficient, self.__command
+            external_temp, self.__coefficient, command
         )
-        print(
-            f"| {now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control} |"
+        logger.info(
+            f"| {now_str} | {output_temp} | {external_temp} | {wanted_temperature} | {control} | {command} |"
         )
-        csv_row = [now_str, output_temp, external_temp, wanted_temperature, control]
+        csv_row = [now_str, output_temp, external_temp, wanted_temperature, control, command]
         write_row_to_csv(csv_row)
