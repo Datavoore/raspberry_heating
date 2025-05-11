@@ -49,7 +49,7 @@ class Pump(object):
 
     def set_state(self, state: bool):
         if state != self.__state:
-            GPIO.output(self.__pin_number, int(state))
+            GPIO.output(self.__pin_number, int(not state))
             self.__state = not state
 
 def write_row_to_csv(row):
