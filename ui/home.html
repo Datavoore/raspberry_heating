@@ -118,16 +118,16 @@
   </div>
   <div class="controller-control"> <h2>Contrôle Contrôleur/Logique</h2> <button id="controllerToggleButton">Chargement...</button> <div id="controllerStatusMessage" style="margin-top: 10px;"></div> </div>
   <ul>
-    <li><a href="http://0.0.0.0:8042/plot" id="link1">Graphique d'aujourd'hui</a></li>
-    <li><a href="http://0.0.0.0:8042/plot/yesterday" id="link2">Graphique d'hier</a></li>
-    <li><a href="http://0.0.0.0:8042/plot?subset=30m" id="link3">30 dernières minutes</a></li>
-    <li><a href="http://0.0.0.0:8042/plot?subset=3h" id="link4">3 dernières heures</a></li>
+    <li><a href="http://saintpaer.servebeer.com:8042/plot" id="link1">Graphique d'aujourd'hui</a></li>
+    <li><a href="http://saintpaer.servebeer.com:8042/plot/yesterday" id="link2">Graphique d'hier</a></li>
+    <li><a href="http://saintpaer.servebeer.com:8042/plot?subset=30m" id="link3">30 dernières minutes</a></li>
+    <li><a href="http://saintpaer.servebeer.com:8042/plot?subset=3h" id="link4">3 dernières heures</a></li>
   </ul>
 </div>
 
 <script>
   // Base URL for your API
-  const API_BASE_URL = 'http://0.0.0.0:8042'; // Or use window.location.origin if serving from the same origin
+  const API_BASE_URL = 'http://saintpaer.servebeer.com:8042'; // Or use window.location.origin if serving from the same origin
 
   // Function to fetch temperature from the given URL (No change needed)
   function fetchTemperature(url, probeNumber, sondeName) {
