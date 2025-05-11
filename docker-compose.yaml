@@ -37,7 +37,7 @@ services:
       - "8042:8042" # Map host port 8042 to container port 8042
     volumes:
       # If probe.py in the server also reads directly from 1-Wire sensors
-      - /sys/bus/w1/devices:/sys/bus/w1/devices
+      # - /sys/bus/w1/devices:/sys/bus/w1/devices
       - ./data:/home/pi/Documents/raspberry_heating/data/  # Map your CSV data directory
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro

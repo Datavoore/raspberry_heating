@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chauffage Saint-Paër</title>
-  <style>
+<style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -16,7 +10,7 @@
       margin: 20px auto;
       padding: 20px;
       background-color: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px rgba.container(0, 0, 0, 0.1);
       border-radius: 8px;
     }
     h1 {
@@ -26,6 +20,7 @@
     ul {
       list-style-type: none;
       padding: 0;
+      margin-top: 20px; /* Add some space above links */
     }
     li {
       margin-bottom: 10px;
@@ -46,11 +41,11 @@
       text-align: center;
       margin-bottom: 20px;
     }
-     /* Added style for command override section */
+     /* Existing style for command override section */
     .command-override {
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid #ccc;
+      /* Removed border-top */
       text-align: center;
     }
     .command-override input[type="number"] {
@@ -72,11 +67,37 @@
       background-color: #0056b3;
     }
 
-    .separator {
-      border-top: 1px solid #ccc;
-      margin-top: 20px;
-      margin-bottom: 20px;
+    /* --- Modified Style for Controller Control --- */
+    .controller-control { /* Renamed class */
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #ccc; /* Added border-top here */
+        text-align: center;
     }
+    .controller-control button { /* Applied style to button */
+        padding: 10px 20px;
+        font-size: 1em;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .controller-control button.is-on {
+        background-color: #28a745; /* Green for On */
+    }
+    .controller-control button.is-on:hover {
+        background-color: #218838;
+    }
+     .controller-control button.is-off {
+        background-color: #dc3545; /* Red for Off */
+    }
+    .controller-control button.is-off:hover {
+        background-color: #c82333;
+    }
+    /* --- End Modified Style --- */
+
+    /* Removed separator style */
   </style>
 </head>
 <body>
@@ -85,10 +106,9 @@
   <h1>Chauffage Saint-Paër</h1>
   <div class="temperature" id="temperatureDisplay1"></div>
   <div class="temperature" id="temperatureDisplay2"></div>
-  <div class="separator"></div>
 
   <div class="command-override">
-    <h2>Commande</h2>
+    <h2>Commande Override</h2>
     <div id="currentCommandDisplay">Chargement...</div>
     <div>
         <input type="number" id="newCommandInput" placeholder="Nouvelle valeur">
@@ -96,7 +116,7 @@
     </div>
      <div id="commandStatusMessage" style="margin-top: 10px; color: green;"></div>
   </div>
-  <div class="separator"></div>
+  <div class="controller-control"> <h2>Contrôle Contrôleur/Logique</h2> <button id="controllerToggleButton">Chargement...</button> <div id="controllerStatusMessage" style="margin-top: 10px;"></div> </div>
   <ul>
     <li><a href="http://saintpaer.servebeer.com:8042/plot" id="link1">Graphique d'aujourd'hui</a></li>
     <li><a href="http://saintpaer.servebeer.com:8042/plot/yesterday" id="link2">Graphique d'hier</a></li>
@@ -109,17 +129,17 @@
   // Base URL for your API
   const API_BASE_URL = 'http://saintpaer.servebeer.com:8042'; // Or use window.location.origin if serving from the same origin
 
-  // Function to fetch temperature from the given URL
+  // Function to fetch temperature from the given URL (No change needed)
   function fetchTemperature(url, probeNumber, sondeName) {
     fetch(url)
       .then(response => response.json())
       .then(data => {
         let temperature = data["Temperature Probe"];
-         if (temperature !== undefined) { // Check if temperature exists in the response
+         if (temperature !== undefined && temperature !== null && !isNaN(temperature)) {
             temperature = temperature / 1000;
-            document.getElementById(`temperatureDisplay${probeNumber}`).innerHTML = `Température sonde ${sondeName}: ${temperature} °C`;
+            document.getElementById(`temperatureDisplay${probeNumber}`).innerHTML = `Température sonde ${sondeName}: ${temperature.toFixed(1)} °C`; // Format to 1 decimal place
          } else {
-            document.getElementById(`temperatureDisplay${probeNumber}`).innerHTML = `Température sonde ${sondeName}: Erreur ou donnée non disponible`;
+            document.getElementById(`temperatureDisplay${probeNumber}`).innerHTML = `Température sonde ${sondeName}: Donnée non disponible`;
          }
       })
       .catch(error => {
@@ -128,12 +148,22 @@
       });
   }
 
-  // --- New Code for Command Override JS ---
+  // --- Modified Code for Fetching and Displaying Combined State ---
 
-  // Function to fetch and display the current command override
-  function fetchAndDisplayCommandOverride() {
-    const displayElement = document.getElementById('currentCommandDisplay');
-    fetch(`${API_BASE_URL}/command-override`)
+  // Function to fetch and display the current command override AND controller state
+  function fetchAndDisplayState() {
+    const commandDisplayElement = document.getElementById('currentCommandDisplay');
+    // Renamed pump elements to controller elements
+    const controllerButtonElement = document.getElementById('controllerToggleButton');
+    const controllerStatusElement = document.getElementById('controllerStatusMessage');
+
+    commandDisplayElement.innerText = 'Chargement...';
+    controllerButtonElement.innerText = 'Chargement...';
+    controllerButtonElement.disabled = true; // Disable while loading
+    controllerButtonElement.className = ''; // Clear classes
+
+
+    fetch(`${API_BASE_URL}/state`)
       .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -141,20 +171,43 @@
         return response.json();
       })
       .then(data => {
+        // Display Command Override (No change needed here)
         const commandValue = data.command_override;
         if (commandValue !== null && commandValue !== undefined) {
-          displayElement.innerText = `Valeur actuelle: ${commandValue}`;
+          commandDisplayElement.innerText = `Valeur actuelle: ${commandValue}`;
         } else {
-          displayElement.innerText = 'Valeur actuelle: Non définie';
+          commandDisplayElement.innerText = 'Valeur actuelle: Non définie';
         }
+
+        // Display Controller State (Modified to use new key)
+        const isControllerOn = data.controller_on; // Expecting boolean with new key name
+        if (isControllerOn === true) {
+            controllerButtonElement.innerText = 'Contrôleur/Logique: ON';
+            controllerButtonElement.className = 'is-on';
+        } else if (isControllerOn === false) {
+             controllerButtonElement.innerText = 'Contrôleur/Logique: OFF';
+             controllerButtonElement.className = 'is-off';
+        } else {
+             controllerButtonElement.innerText = 'État inconnu';
+             controllerButtonElement.className = ''; // No specific class
+             controllerStatusElement.innerText = 'Impossible de déterminer l\'état du contrôleur'; // Updated message
+             controllerStatusElement.style.color = 'orange';
+        }
+        controllerButtonElement.disabled = false; // Enable button after loading state
+
       })
       .catch(error => {
-        console.error('Error fetching command override:', error);
-        displayElement.innerText = 'Échec de la récupération de la commande actuelle';
+        console.error('Error fetching state:', error);
+        commandDisplayElement.innerText = 'Échec de la récupération de la commande actuelle';
+        controllerButtonElement.innerText = 'Échec Chargement';
+        controllerButtonElement.disabled = true; // Keep disabled on error
+        controllerButtonElement.className = ''; // Clear classes
+        controllerStatusElement.innerText = 'Échec de la récupération de l\'état'; // Updated message
+        controllerStatusElement.style.color = 'red';
       });
   }
 
-  // Function to send the new command override value
+  // Function to send the new command override value (existing, modified to re-fetch state)
   function setCommandOverride() {
     const inputElement = document.getElementById('newCommandInput');
     const statusElement = document.getElementById('commandStatusMessage');
@@ -179,7 +232,6 @@
     })
     .then(response => {
         if (!response.ok) {
-            // Attempt to read error detail from response body
              return response.json().then(err => { throw new Error(`HTTP error! status: ${response.status}, Detail: ${err.detail || response.statusText}`); });
         }
         return response.json();
@@ -188,7 +240,7 @@
       statusElement.innerText = `Commande définie sur ${data.new_value}`;
       statusElement.style.color = 'green';
       inputElement.value = ''; // Clear input on success
-      fetchAndDisplayCommandOverride(); // Refresh display after setting
+      fetchAndDisplayState(); // Refresh ALL state displays after setting command
     })
     .catch(error => {
       console.error('Error setting command override:', error);
@@ -197,20 +249,64 @@
     });
   }
 
+  // Function to toggle the controller state (Modified to use new key and endpoint)
+  function toggleControllerState() { // Renamed function
+      const controllerButtonElement = document.getElementById('controllerToggleButton'); // Renamed element ID
+      const controllerStatusElement = document.getElementById('controllerStatusMessage'); // Renamed status ID
+
+      // Determine current state from button text/class, assume false if unknown
+      const isCurrentlyOn = controllerButtonElement.classList.contains('is-on');
+      const newState = !isCurrentlyOn; // Toggle the state
+
+      controllerStatusElement.innerText = `Demande de basculement vers ${newState ? 'ON' : 'OFF'}...`; // Updated message
+      controllerStatusElement.style.color = 'orange';
+      controllerButtonElement.disabled = true; // Disable button during request
+
+      // Changed endpoint and request body key
+      fetch(`${API_BASE_URL}/controller-state`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // Use the new key name in the request body
+        body: JSON.stringify({ controller_on: newState })
+      })
+      .then(response => {
+          if (!response.ok) {
+              return response.json().then(err => { throw new Error(`HTTP error! status: ${response.status}, Detail: ${err.detail || response.statusText}`); });
+          }
+          return response.json();
+      })
+      .then(data => {
+          // Use the new key name in the response data
+          controllerStatusElement.innerText = `Contrôleur/Logique basculé vers ${data.new_controller_state ? 'ON' : 'OFF'}`; // Updated message
+          controllerStatusElement.style.color = 'green';
+          fetchAndDisplayState(); // Refresh ALL state displays after setting controller state
+      })
+      .catch(error => {
+          console.error('Error toggling controller state:', error);
+          controllerStatusElement.innerText = `Échec du basculement: ${error.message}`; // Updated message
+          controllerStatusElement.style.color = 'red';
+          controllerButtonElement.disabled = false; // Re-enable button on failure
+      });
+  }
+
+
   // Fetch data when the page loads
   window.addEventListener('load', () => {
-    fetchTemperature(`${API_BASE_URL}/temperature/1`, 1, 'extérieure'); // Fetching temperature for probe 1
-    fetchTemperature(`${API_BASE_URL}/temperature/2`, 2, 'radiateur'); // Fetching temperature for probe 2
+    fetchTemperature(`${API_BASE_URL}/temperature/1`, 1, 'extérieure');
+    fetchTemperature(`${API_BASE_URL}/temperature/2`, 2, 'radiateur');
 
-    fetchAndDisplayCommandOverride(); // Fetch and display current command override
+    fetchAndDisplayState(); // Fetch and display BOTH command override and controller state
   });
 
-  // Add event listener to the set command button
+  // Add event listener to the set command button (existing)
   document.getElementById('setCommandButton').addEventListener('click', setCommandOverride);
 
-
-  // --- End New Code ---
-
+  // --- Modified Code: Add event listener to the controller toggle button ---
+  // Renamed element ID and function call
+  document.getElementById('controllerToggleButton').addEventListener('click', toggleControllerState);
+  // --- End Modified Code ---
 
 </script>
 

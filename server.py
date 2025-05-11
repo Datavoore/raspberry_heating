@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from command_override_utils import set_command_override, get_command_override
+from command_override_utils import get_current_state, update_command_state_file
 from probe import probes
 from fastapi.responses import FileResponse
 from plots import plot_router
@@ -70,5 +70,23 @@ async def get_command_override_route():
 # Endpoint to set the command override
 @app.post("/command-override")
 async def set_command(request: SetCommandRequest):
-    success = set_command_override(request.value)
+    update_command_state_file(command_override=request.value)
     return {"status": "success", "new_value": request.value}
+
+# Pydantic model for the controller state request body
+class SetControllerStateRequest(BaseModel):
+    # Renamed the key in the model
+    controller_on: bool
+
+# Endpoint to get the combined command and controller state (No change needed)
+@app.get("/state")
+async def get_state():
+    current_state = get_current_state()
+    return current_state
+
+# Endpoint to set the controller state
+@app.post("/controller-state") # Changed endpoint name for clarity
+async def set_controller_state(request: SetControllerStateRequest):
+    # Use the new key name when updating the file
+    update_command_state_file(controller_on=request.controller_on)
+    return {"status": "success", "new_controller_state": request.controller_on}
