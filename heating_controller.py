@@ -47,10 +47,10 @@ class Pump(object):
         GPIO.output(pin_number, 1)
         self.__state = True
 
-    def set_state(self, state: bool):
-        if state != self.__state:
-            GPIO.output(self.__pin_number, int(not state))
-            self.__state = not state
+    def set_state(self, new_state: bool):
+        if new_state != self.__state:
+            GPIO.output(self.__pin_number, int(not new_state))
+            self.__state = new_state
 
 def write_row_to_csv(row):
     now = datetime.datetime.now()
