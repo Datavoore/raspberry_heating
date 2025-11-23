@@ -14,7 +14,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - ./config_overrides:/app/config_overrides 
-      - ./app:.
+      - .:/app
 
   api-server:
     build:
@@ -30,4 +30,4 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
       - ./config_overrides:/app/config_overrides 
-      - ./app:.
+      - .:/app
